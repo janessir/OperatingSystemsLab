@@ -1,4 +1,4 @@
-threadtest.cc called in main() 
+//  threadtest.cc called in main() 
 //	Simple test case for the round-robin assignment (Experiment 2).
 //
 //	Create and execute 10 threads in all. 
