@@ -113,13 +113,12 @@ class Interrupt {
     
     void OneTick();       		// Advance simulated time
 
-
-
-
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //EXPT 2 added
     void DequeuePendingInterrupt(); //removes a pending interrupt from head of pending list
 
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
   private:
@@ -174,24 +173,19 @@ class Interrupt {
 #include "system.h"
 
 
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
-
-
-
-/* Experiment 2 */
-/* Add code to remove pending interrupt from head of pending list. */
+/* Experiment 2 
+   Add code to remove pending interrupt from head of pending list. */
+   
 void
 Interrupt :: DequeuePendingInterrupt()
 {
-         if (!pending->IsEmpty())
+        if (!pending->IsEmpty())
 	delete pending->Remove();
 }
 
-
-
-
-
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 
