@@ -375,14 +375,17 @@ Thread::Finish ()
 	DEBUG('t', "Finishing thread %s #%i\n", getName(), pid);
 
 	threadToBeDestroyed = currentThread;
+	
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-	/* Experiment 2 */
-	/* Add code here to reset the timer interrupt so that the next 
-	   interrupt is triggered after 40 time ticks from now.
-        */
+	/* Experiment 2
+	   Add code here to reset the timer interrupt so that the next 
+	   interrupt is triggered after 40 time ticks from now. */
 	interrupt->DequeuePendingInterrupt();
 	timer->myfunction();	
 	
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     
 	Sleep();					// invokes SWITCH
     }
@@ -400,6 +403,8 @@ Thread::Finish ()
 	DEBUG('t', "Finishing thread %s #%i\n", getName(), pid);
 
 	threadToBeDestroyed = currentThread;
+	
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 	/* Experiment 2 */
 	/* Add code here to reset the timer interrupt so that the next 
@@ -407,6 +412,9 @@ Thread::Finish ()
 	 */
 	interrupt->DequeuePendingInterrupt();
 	timer->myfunction();
+	
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 	
 	Sleep();					// invokes SWITCH
 
