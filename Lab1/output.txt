@@ -6,8 +6,8 @@ Pending interrupts:
 End of pending interrupts
 	interrupts: off -> on
 Entering SimpleTestForking thread child1 #0 with func=0x804a640, arg=1, join=NO
-	interrupts: on -> off
-Putting thread child1 #0 on ready list.
+	interrupts: on -> off //off-ed interrupts b4 calling ReadyToRun()
+Putting thread child1 #0 on ready list. //done when fork() mthd is called since it in turn calls the ReadyToRun() mthd
 	interrupts: off -> on
 == Tick 20 ==
 	interrupts: on -> off
@@ -25,11 +25,11 @@ Time: 30, interrupts off
 Pending interrupts:
 End of pending interrupts
 	interrupts: off -> on //on interrupts
-*** thread 0 looped 0 times //forked to simpleTest
+*** thread 0 looped 0 times //in simpleTest
 	interrupts: on -> off //off interrupts
 Yielding thread main #0 // main gives up cpu (to child1 @ the head of read queue)
-Putting thread main #0 on ready list. //put main at the back of the ready list
-Switching from thread main #0 to thread child1 #0 //context switch
+Putting thread main #0 on ready list. //put main at the back of the ready list ; ie calls ReadyToRun(old thread)
+Switching from thread main #0 to thread child1 #0 //context switch; ie calls Run(new thread)
 	interrupts: off -> on //on back interrupts after cs
 == Tick 40 ==
 	interrupts: on -> off //off interrupts
@@ -128,7 +128,7 @@ Pending interrupts:
 End of pending interrupts
 	interrupts: off -> on
 *** thread 2 looped 2 times //3rd time alr
-	interrupts: on -> off //disable all other interrupts while servicing current interrupt, ie forking to execute simpleTest
+	interrupts: on -> off //disable all other interrupts while servicing ctxt switch
 Yielding thread child2 #0 //child2 give up cpu
 Putting thread child2 #0 on ready list. 
 Switching from thread child2 #0 to thread main #0 //since main is next on the ready Q
@@ -140,12 +140,12 @@ Time: 120, interrupts off
 Pending interrupts:
 End of pending interrupts
 	interrupts: off -> on //on interrupts 
-	interrupts: on -> off // I think fork to simpleTest but nth printed coz alr looped 3x
+	interrupts: on -> off // Realises thread is done, and offs interrupts to terminate the thread
 Finishing thread main #0
 Sleeping thread main #0
-Switching from thread main #0 to thread child1 #0 //why?? Coz there's still child1, child2 in the ready queue
+Switching from thread main #0 to thread child1 #0 // Coz there's still child1, child2 in the ready queue
 Now in thread child1 #0
-Deleting thread main #0
+Deleting thread main #0 //deletes completed main thread
 	interrupts: off -> on //on back interrupts
 == Tick 130 == //child 1
 	interrupts: on -> off
