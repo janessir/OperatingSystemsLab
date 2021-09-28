@@ -130,7 +130,7 @@ Timer::TimerExpired()
     
     /* Experiment 2 */
     /* Add code below to make the timer periodic. */
-    interrupt->Schedule(TimerHandler, (_int) this, TimeOfNextInterrupt(), TimerInt); 
+    interrupt->Schedule(TimerHandler, (_int) this, TimeOfNextInterrupt(), TimerInt); // ie each time timer expires, schedule another one, as this will be 'deleted'
     
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
