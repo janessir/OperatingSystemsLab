@@ -167,7 +167,12 @@ Initialize(int argc, char **argv)
 
   int argCount;
     char* debugArgs = "";
-    bool randomYield = TRUE;
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	
+    bool randomYield = TRUE; //set to true so that Timer obj will always be created for this RR lab2
+	
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #ifdef USER_PROGRAM
     bool debugUserProg = FALSE;	// single step user program
@@ -223,7 +228,7 @@ Initialize(int argc, char **argv)
     interrupt = new Interrupt;			// start up interrupt handling
     scheduler = new Scheduler();		// initialize the ready queue
     if (randomYield) {				// start the timer (if needed)
-	timer = new Timer(TimerInterruptHandler, 0, randomYield);
+	timer = new Timer(TimerInterruptHandler, 0, randomYield); // will always be created since i set randomYield = true
 	/* Experiment 2*/
 	/* Debug message to denote scheduling of timer interrupt*/
 	DEBUG('i',"*** Timer interrupt scheduled at %d\n",stats->totalTicks+timer->TimeOfNextInterrupt());
