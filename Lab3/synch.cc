@@ -143,7 +143,7 @@ class Condition {
 
 #endif // SYNCH_H
 
---
+------------------------------------------------------------------------------------------------------------------------------
   
 // synch.cc 
 //	Routines for synchronizing threads.  Three kinds of
