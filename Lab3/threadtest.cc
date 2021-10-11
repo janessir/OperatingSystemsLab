@@ -47,22 +47,19 @@ void Dec(_int which)
 void Inc_v1(_int which)
 {
 	//fill your code
-  int a=value;
+	int a=value;
 	a++;
 	value=a;
 	printf("**** Inc thread %d new value %d\n", (int) which, value);
-
-	currentThread->Yield();
+	currentThread->Yield(); //ctxt switch here
 }
 
 //2. implement the new version of Dec: Dec_v1
 void Dec_v1(_int which)
 {
 	//fill your code
-  int a=value;
-	
-	currentThread->Yield();
-
+	int a=value;
+	currentThread->Yield(); //ctxt switch here
 	a--;
 	value=a;
 	printf("**** Dec thread %d new value %d\n", (int) which, value);
@@ -75,15 +72,21 @@ void TestValueOne()
 	value=0;
 	printf("enter TestValueOne, value=%d...\n", value);
 	//1. fill your code here.
-  Thread *t1 = new Thread("Inc1");
+	Thread *t1 = new Thread("Inc1");
 	Thread *t2 = new Thread("Inc2");
-	Thread *t3 = new Thread("Dec3");
-	Thread *t4 = new Thread("Dec4");
-	
-	t3->Fork(Dec_v1, 3, 0);
-	t1->Fork(Inc_v1, 1, 0);
-	t2->Fork(Inc_v1, 2, 0);
-	t4->Fork(Dec_v1, 4, 0);
+	Thread *t3 = new Thread("Dec2");
+	Thread *t4 = new Thread("Dec2");
+
+	t1->Fork(Inc_v1,1,1);
+	t2->Fork(Inc_v1,2,1);
+	t3->Fork(Dec_v1,3,1);
+	t4->Fork(Dec_v1,4,1);
+
+	currentThread->Join(t1);
+	currentThread->Join(t2);
+	currentThread->Join(t3);
+	currentThread->Join(t4);
+
 
 	//2. checking the value. you should not modify the code or add any code lines behind
 	//this section.
@@ -94,88 +97,145 @@ void TestValueOne()
 }
 
 
-// //targetV=-2;
-// //After executing TestValueMinusTwo(), the value should be -2.
-// //1. implement the new version of Inc: Inc_v2
-// void Inc_v2(_int which)
-// {
-// 	//fill your code
-// }
+//targetV=-2;
+//After executing TestValueMinusTwo(), the value should be -2.
+//1. implement the new version of Inc: Inc_v2
+void Inc_v2(_int which)
+{
+	//fill your code
+	int a=value;
+	a++;
+	currentThread->Yield(); //ctxt switch here
+	value=a;
+	printf("**** Inc thread %d new value %d\n", (int) which, value);
+}
 
-// //2. implement the new version of Dec: Dec_v2
-// void Dec_v2(_int which)
-// {
-// 	//fill your code
-// }
+//2. implement the new version of Dec: Dec_v2
+void Dec_v2(_int which)
+{
+	//fill your code
+	int a=value;
+	a--;
+	currentThread->Yield(); //ctxt switch here
+	value=a;
+	printf("**** Dec thread %d new value %d\n", (int) which, value);
+}
 
-// //3. implement TestValueMinusOne by create two threads with Inc_v2 and two threads with Dec_v2
-// // you should pass the checking at the end, printing "congratulations! passed."
-// void TestValueMinusOne()
-// {
-// 	value=0;
-// 	printf("enter TestValueMinusOne, value=%d...\n", value);
-
-
-// 	//fill your code
-
-
-// 	//2. checking the value. you should not modify the code or add any code lines behind
-// 	//this section.
-// 	if(value==-1)
-// 		printf("congratulations! passed.\n");
-// 	else
-// 		printf("value=%d, failed.\n", value);
-// }
+//3. implement TestValueMinusOne by create two threads with Inc_v2 and two threads with Dec_v2
+// you should pass the checking at the end, printing "congratulations! passed."
+void TestValueMinusOne()
+{
+	value=0;
+	printf("enter TestValueMinusOne, value=%d...\n", value);
 
 
-// //Exercise 2: offer an implementation of Inc and Dec so that
-// //no matter what kind of interleaving occurs, the result value should be consistent.
+	//fill your code
+	Thread *t1 = new Thread("Inc1");
+	Thread *t2 = new Thread("Inc2");
+	Thread *t3 = new Thread("Dec2");
+	Thread *t4 = new Thread("Dec2");
 
-// //1. Declare any paramters here.
+	t1->Fork(Inc_v2,1,1);
+	t2->Fork(Inc_v2,2,1);
+	t3->Fork(Dec_v2,3,1);
+	t4->Fork(Dec_v2,4,1);
 
-// //fill your code
-
-// //2. implement the new version of Inc: Inc_Consistent
-// void Inc_Consistent(_int which)
-// {
-// 	//fill your code
-  
-// }
-
-// //3. implement the new version of Dec: Dec_Consistent
-// void Dec_Consistent(_int which)
-// {
-// 	//fill your code
-  
-// }
-
-// //4. implement TestValueMinusOne by create two threads with Inc_Consistent and two threads with Dec_Consistent
-// // you should pass the checking at the end, printing "congratulations! passed."
-// void TestConsistency()
-// {
-// 	value=0;
-// 	printf("enter TestConsistency, value=%d...\n", value);
-
-// 	//fill your code
+	currentThread->Join(t1);
+	currentThread->Join(t2);
+	currentThread->Join(t3);
+	currentThread->Join(t4);
 
 
-// 	//2. checking the value. you should not modify the code or add any code lines behind
-// 	//this section.
-// 	if(value==0)
-// 		printf("congratulations! passed.\n");
-// 	else
-// 		printf("value=%d, failed.\n", value);
-// }
+	//2. checking the value. you should not modify the code or add any code lines behind
+	//this section.
+	if(value==-1)
+		printf("congratulations! passed.\n");
+	else
+		printf("value=%d, failed.\n", value);
+}
 
-// //select the function that you want to test.
-// void
-// ThreadTest()
-// {
-// 	int loopTimes=0;
-//     DEBUG('t', "Entering SimpleTest");
-// 	//for exercise 1.
-//     TestValueOne();
-//     //TestValueMinusOne();
-//     //for exercise 2.
-//     //TestConsistency();
-// }
+
+//Exercise 2: offer an implementation of Inc and Dec so that
+//no matter what kind of interleaving occurs, the result value should be consistent.
+
+//1. Declare any paramters here.
+
+//fill your code
+Lock *ValueLock = new Lock("ValueLock"); //create lock :)
+
+//2. implement the new version of Inc: Inc_Consistent
+void Inc_Consistent(_int which)
+{
+	//fill your code
+	ValueLock->Acquire();
+
+	int a=value;
+	  currentThread->Yield(); //various interleavings
+	a++;
+	  currentThread->Yield(); //various interleavings
+	value=a;
+	printf("**** Inc thread %d new value %d\n", (int) which, value);
+
+	ValueLock->Release();
+}
+
+//3. implement the new version of Dec: Dec_Consistent
+void Dec_Consistent(_int which)
+{
+	//fill your code
+	ValueLock->Acquire();
+
+	int a=value;
+	  currentThread->Yield(); //various interleavings
+	a--;
+	  currentThread->Yield(); //various interleavings
+	value=a;
+	printf("**** Dec thread %d new value %d\n", (int) which, value);
+
+	ValueLock->Release();
+}
+
+//4. implement TestValueMinusOne by create two threads with Inc_Consistent and two threads with Dec_Consistent
+// you should pass the checking at the end, printing "congratulations! passed."
+void TestConsistency()
+{
+	value=0;
+	printf("enter TestConsistency, value=%d...\n", value);
+
+	//fill your code
+	Thread *t1 = new Thread("Inc1");
+	Thread *t2 = new Thread("Inc2");
+	Thread *t3 = new Thread("Dec2");
+	Thread *t4 = new Thread("Dec2");
+
+	t1->Fork(Inc_Consistent,1,1);
+	t2->Fork(Inc_Consistent,2,1);
+	t3->Fork(Dec_Consistent,3,1);
+	t4->Fork(Dec_Consistent,4,1);
+
+	currentThread->Join(t1);
+	currentThread->Join(t2);
+	currentThread->Join(t3);
+	currentThread->Join(t4);
+
+
+	//2. checking the value. you should not modify the code or add any code lines behind
+	//this section.
+	if(value==0)
+		printf("congratulations! passed.\n");
+	else
+		printf("value=%d, failed.\n", value);
+}
+
+//select the function that you want to test.
+void
+ThreadTest()
+{
+	int loopTimes=0;
+    DEBUG('t', "Entering SimpleTest");
+	//for exercise 1.
+    TestValueOne();
+    TestValueMinusOne();
+    	//for exercise 2.
+    TestConsistency();
+}
