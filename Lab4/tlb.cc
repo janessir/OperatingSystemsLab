@@ -127,6 +127,23 @@ int VpnToPhyPage(int vpn)
 {
   //your code here to get a physical frame for page vpn
   //you can refer to PageOutPageIn(int vpn) to see how an entry was created in ipt
+	 
+  // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	//debug message at this time tick for IPT b4 insertion
+	for(int k = 0; k < NumPhysPages; k++)
+		DEBUG('p', "\n**** IPT [%i]: <pid, vpn, last-Used, valid-flag> = <%i, %i, %i, %i> \n", k, memoryTable[k].pid, memoryTable[k].vPage, memoryTable[k].lastUsed, memoryTable[k].valid);
+	
+	for(int i = 0; i < NumPhysPages; i++){
+		if(memoryTable[i].vPage == vpn && 
+			memoryTable[i].pid == currentThread->pid &&
+			memoryTable[i].valid){
+				DEBUG('p', "Found! vpn %i of pid %d already exists in IPT[%d]\n", vpn, currentThread->pid, i);
+				return i;
+		}
+	}
+  return -1;
+  
+  // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }
 
 //----------------------------------------------------------------------
@@ -141,6 +158,39 @@ void InsertToTLB(int vpn, int phyPage)
   
   //your code to find an empty in TLB or to replace the oldest entry if TLB is full
   
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  
+	//to always point to the oldest entry in tlb
+	static int FIFOPointer = 0;  //in c++, static var is not re-initalized 
+															 //even when fn is called multiple times	
+
+	bool emptySlot = false;
+	int j;
+
+	for(j = 0; j < TLBSize; j++){
+		if(!machine->tlb[j].valid){
+			emptySlot = true;
+			break;
+		}		
+	}
+	
+	if(emptySlot){
+		i = j;
+		if(i == FIFOPointer) //emptySlot and FIFOPointer also points to the slot, need to inc FIFOPointer !
+			FIFOPointer = (i + 1) % TLBSize; 
+	}
+	else{
+		i = FIFOPointer;
+		FIFOPointer = (i + 1) % TLBSize;
+	}
+	
+	//debug message for tlb at this tick b4 the insertion
+	for(int k = 0; k < TLBSize; k++)
+		DEBUG('p', "\n****TLB[%i] : <vpn, phyPage, valid-flag> = <%i, %i, %i>\n", k, machine->tlb[k].virtualPage, machine->tlb[k].physicalPage, machine->tlb[k].valid );	
+  
+
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  
   // copy dirty data to memoryTable
   if(machine->tlb[i].valid){
     memoryTable[machine->tlb[i].physicalPage].dirty=machine->tlb[i].dirty;
@@ -152,7 +202,7 @@ void InsertToTLB(int vpn, int phyPage)
   machine->tlb[i].physicalPage = phyPage;
   machine->tlb[i].valid        = TRUE;
   machine->tlb[i].readOnly     = FALSE;
-  machine->tlb[i].use          = FALSE;
+  machine->tlb[i].use          = FALSE; //will be true once you ref this vpn the 2nd time
   machine->tlb[i].dirty        = memoryTable[phyPage].dirty;
 
   //update the corresponding memoryTable
@@ -164,7 +214,7 @@ void InsertToTLB(int vpn, int phyPage)
   
   //increase the number of tlb misses
   stats->numTlbMisses++;
-  
+
 }
 
 //----------------------------------------------------------------------
@@ -184,6 +234,7 @@ int PageOutPageIn(int vpn)
   
   //Page out the victim page to free the physical frame
   DoPageOut(phyPage);
+
   //Page in the new page to the freed physical frame
   DoPageIn(vpn, phyPage);
   
@@ -195,6 +246,8 @@ int PageOutPageIn(int vpn)
   memoryTable[phyPage].TLBentry=-1;
   memoryTable[phyPage].lastUsed=0;
   memoryTable[phyPage].swapPtr=currentThread->space->swapPtr;
+
+	
   
   return phyPage;
 }
@@ -239,6 +292,13 @@ void DoPageOut(int phyPage)
       
       //increase the number of page faults
       stats->numPageOuts++;
+      
+      // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+      //debug message for paging out
+      DEBUG('p', "**** pageout = Y\n");
+      
+      // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
     memoryTable[phyPage].valid=FALSE;
@@ -290,9 +350,31 @@ int lruAlgorithm(void)
 {
   //your code here to find the physical frame that should be freed 
   //according to the LRU algorithm. 
-  int phyPage;
   
+  // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  
+  int phyPage;
+	int leastUsedTime = memoryTable[0].lastUsed;
+	int leastUsedFrame = 0;
+
+
+	for(int i = 0; i < NumPhysPages; i++){
+		if(!memoryTable[i].valid){ //there's empty frame
+			phyPage = i;
+			break;
+		}
+		else{ //keep track of least recently used frame #
+			if(leastUsedTime > memoryTable[i].lastUsed){ //finding the frame with the shortest time stamp
+        leastUsedTime = memoryTable[i].lastUsed;
+        leastUsedFrame = i;
+      }
+      phyPage = leastUsedFrame;
+		}
+	}
+
   return phyPage;
+  
+  // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }
 
 //----------------------------------------------------------------------
@@ -331,3 +413,4 @@ void PageOutMmapSpace(int beginPage, int endPage)
     DoPageOut(phyPage);
   }
 }
+
