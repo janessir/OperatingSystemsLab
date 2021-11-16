@@ -177,11 +177,10 @@ void InsertToTLB(int vpn, int phyPage)
 	if(emptySlot){
 		i = j;
 		if(i == FIFOPointer) //emptySlot and FIFOPointer also points to the slot, need to inc FIFOPointer !
-			FIFOPointer = (i + 1) % TLBSize; 
+			FIFOPointer = (FIFOPointer + 1) % TLBSize; 
 	}
 	else{
-		i = FIFOPointer;
-		FIFOPointer = (i + 1) % TLBSize;
+		FIFOPointer = (FIFOPointer + 1) % TLBSize;
 	}
 	
 	//debug message for tlb at this tick b4 the insertion
