@@ -74,7 +74,7 @@ void TestValueOne()
 	//1. fill your code here.
 	Thread *t1 = new Thread("Inc1");
 	Thread *t2 = new Thread("Inc2");
-	Thread *t3 = new Thread("Dec2");
+	Thread *t3 = new Thread("Dec1");
 	Thread *t4 = new Thread("Dec2");
 
 	t1->Fork(Inc_v1,1,1);
@@ -132,7 +132,7 @@ void TestValueMinusOne()
 	//fill your code
 	Thread *t1 = new Thread("Inc1");
 	Thread *t2 = new Thread("Inc2");
-	Thread *t3 = new Thread("Dec2");
+	Thread *t3 = new Thread("Dec1");
 	Thread *t4 = new Thread("Dec2");
 
 	t1->Fork(Inc_v2,1,1);
@@ -205,7 +205,7 @@ void TestConsistency()
 	//fill your code
 	Thread *t1 = new Thread("Inc1");
 	Thread *t2 = new Thread("Inc2");
-	Thread *t3 = new Thread("Dec2");
+	Thread *t3 = new Thread("Dec1");
 	Thread *t4 = new Thread("Dec2");
 
 	t1->Fork(Inc_Consistent,1,1);
