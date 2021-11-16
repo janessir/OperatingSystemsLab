@@ -48,10 +48,11 @@ void Inc_v1(_int which)
 {
 	//fill your code
 	int a=value;
+	currentThread->Yield(); //ctxt switch here
 	a++;
 	value=a;
 	printf("**** Inc thread %d new value %d\n", (int) which, value);
-	currentThread->Yield(); //ctxt switch here
+	//currentThread->Yield(); //ctxt switch here
 }
 
 //2. implement the new version of Dec: Dec_v1
@@ -59,7 +60,7 @@ void Dec_v1(_int which)
 {
 	//fill your code
 	int a=value;
-	currentThread->Yield(); //ctxt switch here
+	//currentThread->Yield(); //ctxt switch here
 	a--;
 	value=a;
 	printf("**** Dec thread %d new value %d\n", (int) which, value);
@@ -105,7 +106,7 @@ void Inc_v2(_int which)
 	//fill your code
 	int a=value;
 	a++;
-	currentThread->Yield(); //ctxt switch here
+	//currentThread->Yield(); //ctxt switch here
 	value=a;
 	printf("**** Inc thread %d new value %d\n", (int) which, value);
 }
@@ -115,8 +116,9 @@ void Dec_v2(_int which)
 {
 	//fill your code
 	int a=value;
-	a--;
 	currentThread->Yield(); //ctxt switch here
+	a--;
+	//currentThread->Yield(); //ctxt switch here
 	value=a;
 	printf("**** Dec thread %d new value %d\n", (int) which, value);
 }
@@ -134,11 +136,13 @@ void TestValueMinusOne()
 	Thread *t2 = new Thread("Inc2");
 	Thread *t3 = new Thread("Dec1");
 	Thread *t4 = new Thread("Dec2");
-
-	t1->Fork(Inc_v2,1,1);
-	t2->Fork(Inc_v2,2,1);
+	
 	t3->Fork(Dec_v2,3,1);
 	t4->Fork(Dec_v2,4,1);
+	t1->Fork(Inc_v2,1,1);
+	t2->Fork(Inc_v2,2,1);
+	//t3->Fork(Dec_v2,3,1);
+	//t4->Fork(Dec_v2,4,1);
 
 	currentThread->Join(t1);
 	currentThread->Join(t2);
@@ -168,12 +172,13 @@ void Inc_Consistent(_int which)
 {
 	//fill your code
 	ValueLock->Acquire();
-
+	  currentThread->Yield(); //various interleavings
 	int a=value;
 	  currentThread->Yield(); //various interleavings
 	a++;
 	  currentThread->Yield(); //various interleavings
 	value=a;
+	  currentThread->Yield(); //various interleavings
 	printf("**** Inc thread %d new value %d\n", (int) which, value);
 
 	ValueLock->Release();
@@ -184,12 +189,13 @@ void Dec_Consistent(_int which)
 {
 	//fill your code
 	ValueLock->Acquire();
-
+	  currentThread->Yield(); //various interleavings
 	int a=value;
 	  currentThread->Yield(); //various interleavings
 	a--;
 	  currentThread->Yield(); //various interleavings
 	value=a;
+	  currentThread->Yield(); //various interleavings
 	printf("**** Dec thread %d new value %d\n", (int) which, value);
 
 	ValueLock->Release();
