@@ -365,10 +365,10 @@ int lruAlgorithm(void)
 		}
 		else{ //keep track of least recently used frame #
 			if(leastUsedTime > memoryTable[i].lastUsed){ //finding the frame with the shortest time stamp
-        leastUsedTime = memoryTable[i].lastUsed;
-        leastUsedFrame = i;
-      }
-      phyPage = leastUsedFrame;
+				leastUsedTime = memoryTable[i].lastUsed;
+				leastUsedFrame = i;
+	 		}
+      			phyPage = leastUsedFrame;
 		}
 	}
 
