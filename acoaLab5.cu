@@ -11,6 +11,21 @@
 // Hello from GPU2[4]!
 // Hello from GPU2[5]!
 
+#include <stdio.h>
+
+//kernel code
+__global__ 
+void hello_GPU1(){
+	int i = threadIdx.x;
+	printf("Hello from GPU1[%d]\n",i);
+}
+__global__ 
+void hello_GPU2(){
+	int i = blockIdx.x * blockDim.x + threadIdx.x;
+	printf("Hello from GPU2[%d]\n",i);
+}
+
+//host code
 int main(){
 	printf("Hello from CPU!\n");
 	hello_GPU1<<<1,4>>>();
@@ -20,17 +35,6 @@ int main(){
 	return 0;
 }
 
-//kernel code
-__global__ 
-void hello_GPU1(){
-	int i = threadIdx.x;
-	printf("Hello from GPU1[%d]\n",i);
-}
-__global__ 
-void hello_GPU1(){
-	int i = blockIdx.x * blockDim.x + threadIdx.x;
-	printf("Hello from GPU2[%d]\n",i);
-}
 
 //----------------------------------------
 
@@ -40,6 +44,7 @@ void hello_GPU1(){
 // C 27 35 33 42
 
 //to create 4 threads
+#include <stdio.h>
 
 //kernel code
 __global__
@@ -56,7 +61,7 @@ int main(){
 	int c[n];
 
 	//declare pointers to arrary on device mem
-	int *d_a, d_b, d_c;
+	int *d_a, *d_b, *d_c;
 
 	//assign space for the arrays in GPU global mem
 	cudaMalloc((void**)&d_a, sizeof(int) * n);
@@ -85,6 +90,7 @@ int main(){
 	return 0;
 }
 
+//----------------------------------------
 
 //Q2.3 - Dot product
 // A 22 13 16 5 
@@ -122,7 +128,7 @@ int main(){
 	//assign space for the arrays in GPU global mem
 	cudaMalloc((void**)&d_a, sizeof(int) * n);
 	cudaMalloc((void**)&d_b, sizeof(int) * n);
-	cudaMalloc((void**)&d_c, sizeof(int) * n); //????
+	cudaMalloc((void**)&d_c, sizeof(int) * n); //????  
 
 	//copy the array to gpu mem
 	cudaMemcpy(d_a, a, sizeof(int)*n, cudaMemcpyHostToDevice);
