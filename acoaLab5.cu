@@ -97,18 +97,21 @@ int main(){
 // B 5 22 17 37 
 // Answer = 853
 
+#include <stdio.h>
+
 //kernel code
 __global__
 void dotProduct(int *d_c, int *d_a, int *d_b){
-	int n = blockDim.x;
 	int i = threadIdx.x;
-	__shared__ int temp[n];
+	__shared__ int temp[4];
 
 	temp[i] = d_a[i] * d_b[i];
 
+	 __syncthreads();
+
 	if(i == 0){
 		int sum = 0;
-		for(int j=0; j<n; j++) 
+		for(int j=0; j<4; j++) 
 			sum+= temp[j];
 		//assign the results to c
 		*d_c = sum;
@@ -116,29 +119,30 @@ void dotProduct(int *d_c, int *d_a, int *d_b){
 }
 
 int main(){
-	int n = 4; //size of vector
+	const int N = 4; //size of vector
 	//instantiate vectors
-	int a[n] = {22, 13, 16, 5};
-	int b[n] = {5, 22, 17, 37};
+	int a[N] = {22, 13, 16, 5};
+	int b[N] = {5, 22, 17, 37};
 	int c;
 
 	//declare pointers to arrary on device mem
-	int *d_a, d_b, d_c;
+	int *d_a, *d_b, *d_c;
+
 
 	//assign space for the arrays in GPU global mem
-	cudaMalloc((void**)&d_a, sizeof(int) * n);
-	cudaMalloc((void**)&d_b, sizeof(int) * n);
-	cudaMalloc((void**)&d_c, sizeof(int) * n); //????  
+	cudaMalloc((void**)&d_a, sizeof(int) * N);
+	cudaMalloc((void**)&d_b, sizeof(int) * N);
+	cudaMalloc((void**)&d_c, sizeof(int)); //????
 
 	//copy the array to gpu mem
-	cudaMemcpy(d_a, a, sizeof(int)*n, cudaMemcpyHostToDevice);
-	cudaMemcpy(d_b, b, sizeof(int)*n, cudaMemcpyHostToDevice);
+	cudaMemcpy(d_a, a, sizeof(int)*N, cudaMemcpyHostToDevice);
+	cudaMemcpy(d_b, b, sizeof(int)*N, cudaMemcpyHostToDevice);
 
 	//kernel call
-	vectorAdd<<<1,4>>>(d_c, d_a, d_b, n);
+	dotProduct<<<1,4>>>(d_c, d_a, d_b);
 
 	//copy result in gpu mem to tt in mm
-	cudaMemcpy(c, d_c, sizeof(int)*n, cudaMemcpyDeviceToHost);
+	cudaMemcpy(&c, d_c, sizeof(int), cudaMemcpyDeviceToHost);
 
 	//free up the mem space in gpu
 	cudaFree(d_a);
@@ -148,26 +152,3 @@ int main(){
 	printf("Result: %d\n", c);
 	return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
